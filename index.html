@@ -101,12 +101,30 @@
             transform: translateY(-1px);
         }
 
+        .button-secondary {
+            background: linear-gradient(135deg, #f5e6e8 0%, #e8d4d6 100%);
+            color: #6b5b54;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .button-secondary:hover {
+            background: linear-gradient(135deg, #e8d4d6 0%, #d4c4c6 100%);
+        }
+
         .button-group {
             display: flex;
             flex-direction: column;
             gap: 15px;
             align-items: center;
             margin-top: 30px;
+            position: relative;
+            min-height: 200px;
+        }
+
+        .moving-button {
+            position: absolute;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .hearts {
@@ -252,6 +270,7 @@
             <h1>¿Quieres ser mi cita<br>de San Valentín?</h1>
             <div class="button-group">
                 <button onclick="showResponse('yes1')">si </button>
+                <button id="noButton" class="button-secondary moving-button" onclick="handleNoButton()">No... pero piénsalo bien</button>
                 <button onclick="showResponse('yes2')">obvio chiquito</button>
             </div>
         </div>
@@ -318,6 +337,41 @@
             setTimeout(() => {
                 heart.remove();
             }, 4000);
+        }
+
+        let noButtonClicks = 0;
+        const maxClicks = 3;
+
+        function handleNoButton() {
+            const button = document.getElementById('noButton');
+            noButtonClicks++;
+
+            if (noButtonClicks >= maxClicks) {
+                // Después de 3 intentos, cambiar el texto y aceptar
+                button.textContent = 'Bueno sí';
+                button.onclick = function() {
+                    showResponse('yes3');
+                };
+            } else {
+                // Mover el botón a una nueva posición
+                moveButton(button);
+            }
+        }
+
+        function moveButton(button) {
+            const container = button.parentElement;
+            const containerRect = container.getBoundingClientRect();
+            const buttonRect = button.getBoundingClientRect();
+            
+            // Calcular límites para que el botón no se salga del contenedor
+            const maxX = containerRect.width - buttonRect.width - 40;
+            const maxY = containerRect.height - buttonRect.height - 40;
+            
+            // Generar posición aleatoria elegante
+            const randomX = Math.random() * maxX - (maxX / 2);
+            const randomY = Math.random() * maxY - (maxY / 2);
+            
+            button.style.transform = `translate(${randomX}px, ${randomY}px)`;
         }
     </script>
 </body>

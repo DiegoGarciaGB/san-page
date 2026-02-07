@@ -115,16 +115,35 @@
         .button-group {
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 30px;
             align-items: center;
             margin-top: 30px;
+            width: 100%;
+            padding: 20px;
+        }
+
+        .button-container {
             position: relative;
-            min-height: 200px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            min-height: 60px;
+        }
+
+        .no-button-zone {
+            position: relative;
+            width: 100%;
+            min-height: 300px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding-top: 20px;
         }
 
         .moving-button {
             position: absolute;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            top: 0;
         }
 
         .hearts {
@@ -269,17 +288,20 @@
             <div class="emoji">💌</div>
             <h1>¿Quieres ser mi cita<br>de San Valentín?</h1>
             <div class="button-group">
-                <button onclick="showResponse('yes1')">si </button>
-                <button id="noButton" class="button-secondary moving-button" onclick="handleNoButton()">No... pero piénsalo bien</button>
-                <button onclick="showResponse('yes2')">obvio chiquito</button>
+                <div class="button-container">
+                    <button onclick="showResponse('yes1')">obvio chiquito</button>
+                </div>
+                <div class="no-button-zone">
+                    <button id="noButton" class="button-secondary moving-button" onclick="handleNoButton()">No...</button>
+                </div>
             </div>
         </div>
 
         <!-- Mensaje final -->
         <div class="final-message" id="finalMessage">
             <div class="emoji">❤️</div>
-            <h2>¡Sabía que dirías que sí!</h2>
-            <p>No puedo esperar para ese día especial contigo 💕</p>
+            <h2>¡Yo sabia que si querias mailob!</h2>
+            <p>Espero tu confirmacion por wasap para mandarte el intinerario</p>
         </div>
     </div>
 
@@ -340,36 +362,43 @@
         }
 
         let noButtonClicks = 0;
-        const maxClicks = 3;
+        const noButtonTexts = [
+            'No',
+            '¿Por qué no?',
+            'Eyyyy no seas así',
+            'Bueno si quiero chiquito hermoso guapo'
+        ];
 
         function handleNoButton() {
             const button = document.getElementById('noButton');
             noButtonClicks++;
 
-            if (noButtonClicks >= maxClicks) {
-                // Después de 3 intentos, cambiar el texto y aceptar
-                button.textContent = 'Bueno sí';
-                button.onclick = function() {
-                    showResponse('yes3');
-                };
+            if (noButtonClicks >= noButtonTexts.length) {
+                // En el último texto, el botón acepta
+                showResponse('yes3');
             } else {
-                // Mover el botón a una nueva posición
-                moveButton(button);
+                // Cambiar al siguiente texto
+                button.textContent = noButtonTexts[noButtonClicks];
+                
+                // Mover el botón solo en los primeros clics (no en el último)
+                if (noButtonClicks < noButtonTexts.length - 1) {
+                    moveButton(button);
+                }
             }
         }
 
         function moveButton(button) {
-            const container = button.parentElement;
-            const containerRect = container.getBoundingClientRect();
+            const zone = button.parentElement;
+            const zoneRect = zone.getBoundingClientRect();
             const buttonRect = button.getBoundingClientRect();
             
-            // Calcular límites para que el botón no se salga del contenedor
-            const maxX = containerRect.width - buttonRect.width - 40;
-            const maxY = containerRect.height - buttonRect.height - 40;
+            // Calcular límites dentro de la zona del botón
+            const maxX = (zoneRect.width - buttonRect.width) / 2;
+            const maxY = zoneRect.height - buttonRect.height - 20;
             
-            // Generar posición aleatoria elegante
-            const randomX = Math.random() * maxX - (maxX / 2);
-            const randomY = Math.random() * maxY - (maxY / 2);
+            // Generar posición aleatoria dentro de la zona
+            const randomX = (Math.random() * maxX * 2) - maxX;
+            const randomY = Math.random() * maxY;
             
             button.style.transform = `translate(${randomX}px, ${randomY}px)`;
         }
